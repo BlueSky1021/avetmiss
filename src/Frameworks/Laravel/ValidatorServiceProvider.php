@@ -30,9 +30,10 @@ class ValidatorServiceProvider extends ServiceProvider
                 $natName = $parameters[0];
                 $fieldName = $parameters[1];
                 $validateLength = isset($parameters[2]) && $parameters[2] == 'true';
+                $ifNull = $parameters[3];
 
                 if (!isset($this->natFieldsets[$natName])) {
-                    $natFieldset = '\\Bdt\\Avetmiss\\Nat\\V7\\' . ucfirst($natName);
+                    $natFieldset = '\\Bdt\\Avetmiss\\Nat\\V8\\' . ucfirst($natName);
                     $this->natFieldsets[$natName] = new $natFieldset;
                 }
 
@@ -47,6 +48,14 @@ class ValidatorServiceProvider extends ServiceProvider
 
                 if ($validateLength && $isValid) {
                     $isValid = strlen($value) <= $field->getLength();
+                }
+
+                if ($value != null && $ifNull === 'not_null') {
+                    $isValid = true;
+                } else if ($value === null && $ifNull != 'not_null') {
+                    $isValid = true;
+                } else {
+                    $isValid = false;
                 }
 
                 return $isValid;
